@@ -1,5 +1,6 @@
 import { program } from 'commander';
 import { tryDelegateToNpm } from './package-runner';
+import { registerGitCommands } from './cmds/git-cmds';
 
 // Configure the CLI program
 export const cli = program
@@ -13,6 +14,9 @@ cli
   .action(() => {
     console.log('Hello from ZX CLI!');
   });
+
+// Register git commands
+registerGitCommands(cli);
 
 // Handle unknown commands by trying to delegate to npm
 cli.on('command:*', (unknownCommand: string[]) => {
