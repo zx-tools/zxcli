@@ -2,11 +2,21 @@ import { program } from 'commander';
 import { tryDelegateToNpm } from './package-runner';
 import { registerGitCommands } from './cmds/git-cmds';
 
+// Read version from package.json
+const packageJson = require('../package.json');
+const version = packageJson.version;
+
 // Configure the CLI program
 export const cli = program
   .name('zx')
   .description('ZX Command Line Interface')
-  .version('1.0.0');
+  .version(version);
+
+// Handle -v option (alias for --version)
+cli.option('-v', 'output the version number').action(() => {
+  console.log(version);
+  process.exit(0);
+});
 
 cli
   .command('hello')

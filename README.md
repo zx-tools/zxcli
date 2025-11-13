@@ -1,4 +1,13 @@
 # zxcli
+
+[![NPM Version](https://img.shields.io/npm/v/zxcli.svg)](https://www.npmjs.com/package/zxcli)
+[![NPM Downloads](https://img.shields.io/npm/dm/zxcli.svg)](https://www.npmjs.com/package/zxcli)
+[![NPM Bundle Size](https://img.shields.io/bundlephobia/min/zxcli)](https://bundlephobia.com/package/zxcli)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/zx-tools/zxcli/publish.yml?branch=main)](https://github.com/zx-tools/zxcli/actions)
+[![Node.js Version](https://img.shields.io/node/v/zxcli.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ZX Command Line Interface
 
 ## Quick Install
@@ -36,6 +45,7 @@ npm install -g zxcli
 
 ```bash
 zx hello
+zx --version  # or zx -v
 ```
 
 ### Git Commands
@@ -134,6 +144,21 @@ Check linting with no warnings allowed (used in CI):
 npm run lint:check
 ```
 
+### Version Management
+
+Bump version numbers using semantic versioning:
+
+```bash
+npm run bump:fix    # Patch version (1.0.0 → 1.0.1)
+npm run bump:min    # Minor version (1.0.0 → 1.1.0)
+npm run bump:maj    # Major version (1.0.0 → 2.0.0)
+```
+
+These commands will:
+- Update version in `package.json`
+- Create a git commit
+- Create a git tag (e.g., `v1.0.1`)
+
 ### Publishing
 
 Publish the package to NPM:
@@ -161,6 +186,107 @@ npm run release
 ```
 
 This script performs all quality checks and publishes in one command.
+
+**Recommended workflow:**
+```bash
+# Make your changes
+npm run bump:min    # Bump minor version
+npm run release     # Test, build, and publish
+```
+
+## Deployment
+
+This project uses automated deployment pipelines to ensure reliable releases.
+
+### Automated Publishing
+
+GitHub Actions automatically publishes new versions to NPM when minor versions change:
+
+#### Setup
+1. **Create NPM Token**: Go to https://www.npmjs.com/settings/tokens and create an automation token
+2. **Add to GitHub Secrets**: In your repository settings, add `NPM_TOKEN` secret with your NPM token
+
+#### CI/CD Pipeline
+The automated pipeline includes:
+- ✅ **Version Detection**: Monitors for minor version bumps (e.g., 1.0.0 → 1.1.0)
+- ✅ **Quality Gates**: Linting, testing, and building before publish
+- ✅ **Automated Release**: Publishes to NPM with public access
+- ✅ **Git Tagging**: Creates version tags automatically
+
+#### Triggers
+- **Branch**: `main` branch only
+- **Condition**: Minor version changes detected
+- **Workflow**: `.github/workflows/publish.yml`
+
+### Manual Deployment
+
+For manual control or different version bumps:
+
+```bash
+# Version bumping
+npm run bump:fix    # Patch: 1.0.0 → 1.0.1
+npm run bump:min    # Minor: 1.0.0 → 1.1.0
+npm run bump:maj    # Major: 1.0.0 → 2.0.0
+
+# Publishing
+npm run publish:npm # Direct publish to NPM
+npm run release     # Full release pipeline
+```
+
+### Platform Installers
+
+Cross-platform installation scripts are available:
+
+#### Windows
+```powershell
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/zx-tools/zxcli/main/install.bat" -OutFile "install.bat"; .\install.bat
+```
+
+#### macOS/Linux
+```bash
+curl -o install.sh https://raw.githubusercontent.com/zx-tools/zxcli/main/install.sh && chmod +x install.sh && ./install.sh
+```
+
+**Installer Features:**
+- ✅ Node.js version checking
+- ✅ Git installation detection
+- ✅ Automatic ZX CLI installation
+- ✅ Platform-specific guidance
+
+### Release Workflow
+
+**Recommended automated workflow:**
+```bash
+# Development
+git checkout -b feature/new-feature
+# Make changes...
+
+# Release preparation
+git checkout main
+git merge feature/new-feature
+npm run bump:min
+git push origin main
+
+# GitHub Actions automatically:
+# 1. Detects version change
+# 2. Runs quality checks
+# 3. Builds and publishes
+```
+
+**Manual workflow:**
+```bash
+npm run bump:min    # Version bump
+npm run release     # Quality checks + publish
+```
+
+### Deployment Status
+
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/zx-tools/zxcli/publish.yml?branch=main)](https://github.com/zx-tools/zxcli/actions)
+
+**Current Status:**
+- **NPM Package**: https://www.npmjs.com/package/zxcli
+- **Latest Version**: See NPM badge above
+- **CI/CD**: GitHub Actions with automated publishing
 
 ### Testing
 

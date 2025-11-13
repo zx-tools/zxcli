@@ -38,6 +38,9 @@
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts",
     "lint:fix": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts --fix",
     "lint:check": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts --max-warnings 0",
+    "bump:maj": "npm version major",
+    "bump:min": "npm version minor",
+    "bump:fix": "npm version patch",
     "publish:npm": "npm publish --access public",
     "release": "npm run lint:check && npm run test && npm run clean && npm run build && npm run publish:npm"
   },

@@ -1,0 +1,81 @@
+name: Publish to NPM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-version-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for version bump
+        id: version-check
+        run: |
+          # Check if the current commit was created by npm version
+          # npm version creates commits with just the version number
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B | tr -d '\n')
+
+          # Check if commit message is just a version number (npm version pattern)
+          if echo "$COMMIT_MESSAGE" | grep -E -q '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+            echo "🎉 NPM version commit detected: $COMMIT_MESSAGE"
+            echo "Will publish to NPM."
+          else
+            # Fallback: Check if version actually changed in package.json
+            CURRENT_VERSION=$(node -p "require('./package.json').version")
+            PREVIOUS_VERSION=$(git show HEAD~1:package.json 2>/dev/null | grep '"version"' | head -1 | sed 's/.*"version": "\([^"]*\)".*/\1/' || echo "")
+
+            if [ -z "$PREVIOUS_VERSION" ]; then
+              echo "Could not determine previous version. Skipping publish."
+              echo "should_publish=false" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+
+            CURRENT_MINOR=$(echo $CURRENT_VERSION | cut -d. -f1,2)
+            PREVIOUS_MINOR=$(echo $PREVIOUS_VERSION | cut -d. -f1,2)
+
+            echo "Current version: $CURRENT_VERSION (minor: $CURRENT_MINOR)"
+            echo "Previous version: $PREVIOUS_VERSION (minor: $PREVIOUS_MINOR)"
+
+            if [ "$CURRENT_MINOR" != "$PREVIOUS_MINOR" ]; then
+              echo "should_publish=true" >> $GITHUB_OUTPUT
+              echo "🎉 Minor version changed! Will publish to NPM."
+            else
+              echo "should_publish=false" >> $GITHUB_OUTPUT
+              echo "ℹ️ No minor version change detected. Skipping NPM publish."
+            fi
+          fi
+
+      - name: Run linting
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm run lint:check
+
+      - name: Run tests
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm test
+
+      - name: Build package
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm run build
+
+      - name: Publish to NPM
+        if: steps.version-check.outputs.should_publish == 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
