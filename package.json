@@ -20,6 +20,11 @@
   "bin": {
     "zx": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts",
@@ -30,7 +35,9 @@
     "test:coverage": "jest --coverage",
     "lint": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts",
     "lint:fix": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts --fix",
-    "lint:check": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts --max-warnings 0"
+    "lint:check": "cross-env ESLINT_USE_FLAT_CONFIG=false eslint src/**/*.ts --max-warnings 0",
+    "publish:npm": "npm publish --access public",
+    "release": "npm run lint:check && npm run test && npm run clean && npm run build && npm run publish:npm"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

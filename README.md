@@ -57,6 +57,34 @@ Check linting with no warnings allowed (used in CI):
 npm run lint:check
 ```
 
+### Publishing
+
+Publish the package to NPM:
+
+```bash
+npm run publish:npm
+```
+
+**Note**: Make sure you're logged in to NPM first:
+```bash
+npm login
+```
+
+Or for automated publishing, set up NPM authentication with a token:
+```bash
+npm config set //registry.npmjs.org/:_authToken YOUR_TOKEN
+```
+
+### Release
+
+Run a complete release process (linting, testing, building, and publishing):
+
+```bash
+npm run release
+```
+
+This script performs all quality checks and publishes in one command.
+
 ### Testing
 
 Run the test suite:
