@@ -1,14 +1,25 @@
 import { cli } from '../index';
 
+// Mock the package-runner module
+jest.mock('../package-runner', () => ({
+  tryDelegateToNpm: jest.fn()
+}));
+
 describe('ZX CLI', () => {
   let consoleSpy: jest.SpyInstance;
+  let errorSpy: jest.SpyInstance;
+  let exitSpy: jest.SpyInstance;
 
   beforeEach(() => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    errorSpy = jest.spyOn(console, 'error').mockImplementation();
+    exitSpy = jest.spyOn(process, 'exit').mockImplementation();
   });
 
   afterEach(() => {
     consoleSpy.mockRestore();
+    errorSpy.mockRestore();
+    exitSpy.mockRestore();
   });
 
   it('should have the correct program name and description', () => {
@@ -34,4 +45,7 @@ describe('ZX CLI', () => {
     // Check that hello message was logged
     expect(consoleSpy).toHaveBeenCalledWith('Hello from ZX CLI!');
   });
+
+  // Integration tests for CLI behavior are tested separately
+  // These unit tests focus on CLI configuration and setup
 });
